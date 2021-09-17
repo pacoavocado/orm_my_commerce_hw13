@@ -8,7 +8,7 @@ router.get('/', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoryData = await Category.findAll(req.body, {
-      include: [Product]
+      include: [{Product}]
     });
     res.status(200).json(categoryData);
   } catch (err) {
@@ -21,7 +21,7 @@ router.get('/:id', async (req, res) => {
   // be sure to include its associated Products
   try {
     const categoryData = await Category.findByPk(req.params.id, {
-      include: [Product]
+       include: [{Product}]
     });
 
     if (!categoryData) {
@@ -54,23 +54,23 @@ router.put('/:id', (req, res) => {
   })
     .then((category) => {
       // find all associated tags from ProductTag
-      return Category.findAll({ where: { category_id: req.params.id } });
+      return ProductTag.findAll({ where: { category_id: req.params.id } });
     })
-    .then((category) => {
+    .then((productTags) => {
       // get list of current category_ids
-      const categoryId = categoryTags.map(({ category_id }) => category_id);
+      const productTagIds = productTags.map(({ tag_id }) => tag_id);
       // create filtered list of new category_ids
-      const newCategoryTags = req.body.tagIds
-        .filter((category_id) => !categoryId.includes(category_id))
-        .map((category_id) => {
+      const newProductTags = req.body.tagIds
+        .filter((tag_id) => !productTagId.includes(tag_id))
+        .map((tag_id) => {
           return {
             product_id: req.params.id,
-            category_id,
+            tag_id,
           };
         });
       // figure out which ones to remove
       const productTagsToRemove = productTags
-        .filter(({ category_id }) => !req.body.tagIds.includes(category_id))
+        .filter(({ tag_id }) => !req.body.tagIds.includes(tag_id))
         .map(({ id }) => id);
 
       // run both actions
